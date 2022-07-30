@@ -2,7 +2,10 @@ module github.com/bodokaiser/entgo-multi-tenancy
 
 go 1.18
 
-require entgo.io/ent v0.11.2-0.20220729101720-9673a4d5069a
+require (
+	entgo.io/ent v0.11.2-0.20220729101720-9673a4d5069a
+	github.com/mattn/go-sqlite3 v1.14.13
+)
 
 require (
 	ariga.io/atlas v0.5.1-0.20220717122844-8593d7eb1a8e // indirect
