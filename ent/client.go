@@ -330,7 +330,8 @@ func (c *TeamClient) QueryMembers(t *Team) *MemberQuery {
 
 // Hooks returns the client hooks.
 func (c *TeamClient) Hooks() []Hook {
-	return c.hooks.Team
+	hooks := c.hooks.Team
+	return append(hooks[:len(hooks):len(hooks)], team.Hooks[:]...)
 }
 
 // UserClient is a client for the User schema.

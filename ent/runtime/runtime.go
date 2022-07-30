@@ -2,7 +2,41 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/bodokaiser/entgo-multi-tenancy/ent/runtime.go
+import (
+	"context"
+
+	"github.com/bodokaiser/entgo-multi-tenancy/ent/member"
+	"github.com/bodokaiser/entgo-multi-tenancy/ent/schema"
+	"github.com/bodokaiser/entgo-multi-tenancy/ent/team"
+
+	"entgo.io/ent"
+	"entgo.io/ent/privacy"
+)
+
+// The init function reads all schema descriptors with runtime code
+// (default values, validators, hooks and policies) and stitches it
+// to their package variables.
+func init() {
+	memberFields := schema.Member{}.Fields()
+	_ = memberFields
+	// memberDescOwner is the schema descriptor for owner field.
+	memberDescOwner := memberFields[0].Descriptor()
+	// member.DefaultOwner holds the default value on creation for the owner field.
+	member.DefaultOwner = memberDescOwner.Default.(bool)
+	// memberDescAdmin is the schema descriptor for admin field.
+	memberDescAdmin := memberFields[1].Descriptor()
+	// member.DefaultAdmin holds the default value on creation for the admin field.
+	member.DefaultAdmin = memberDescAdmin.Default.(bool)
+	team.Policy = privacy.NewPolicies(schema.Team{})
+	team.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := team.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+}
 
 const (
 	Version = "v0.11.2-0.20220729101720-9673a4d5069a"           // Version of ent codegen.

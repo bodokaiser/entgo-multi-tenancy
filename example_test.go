@@ -7,36 +7,63 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
+	_ "github.com/bodokaiser/entgo-multi-tenancy/ent/runtime"
+
+	"github.com/bodokaiser/entgo-multi-tenancy/auth"
 	"github.com/bodokaiser/entgo-multi-tenancy/ent"
 )
 
-func Example_CreateTeams() {
+func Example() {
 	ctx := context.Background()
 	client := open(ctx)
 	defer client.Close()
 
-	team1, err := client.Team.
+	user, err := client.User.
+		Create().
+		SetEmail("bodo.kaiser@example.org").
+		SetUsername("bodo.kaiser").
+		Save(ctx)
+	if err != nil {
+		log.Fatalf("failed creating user: %v", err)
+	}
+	fmt.Println(user)
+
+	ctx = auth.WithUser(ctx, user)
+
+	err = client.Team.
 		Create().
 		SetName("Facebook").
-		Save(ctx)
+		Exec(ctx)
 	if err != nil {
 		log.Fatalf("failed creating team: %v", err)
 	}
-	fmt.Println(team1)
 
-	team2, err := client.Team.
+	err = client.Team.
 		Create().
 		SetName("Google").
-		Save(ctx)
-	log.Println(team2)
+		Exec(ctx)
 	if err != nil {
 		log.Fatalf("failed creating team: %v", err)
 	}
-	fmt.Println(team2)
+
+	err = client.Member.
+		Create().
+		SetOwner(true).
+		SetUser(user).
+		SetTeamID(2).
+		Exec(ctx)
+	if err != nil {
+		log.Fatalf("failed creating member: %v", err)
+	}
+
+	teams, err := client.Team.
+		Query().
+		All(ctx)
+	fmt.Println(teams)
 
 	// Output:
-	// Team(id=1, name=Facebook)
-	// Team(id=2, name=Google)
+	// User(id=1, username=bodo.kaiser, email=bodo.kaiser@example.org)
+	// [Team(id=2, name=Google)]
 }
 
 func open(ctx context.Context) *ent.Client {

@@ -2,23 +2,4 @@
 
 package ent
 
-import (
-	"github.com/bodokaiser/entgo-multi-tenancy/ent/member"
-	"github.com/bodokaiser/entgo-multi-tenancy/ent/schema"
-)
-
-// The init function reads all schema descriptors with runtime code
-// (default values, validators, hooks and policies) and stitches it
-// to their package variables.
-func init() {
-	memberFields := schema.Member{}.Fields()
-	_ = memberFields
-	// memberDescOwner is the schema descriptor for owner field.
-	memberDescOwner := memberFields[0].Descriptor()
-	// member.DefaultOwner holds the default value on creation for the owner field.
-	member.DefaultOwner = memberDescOwner.Default.(bool)
-	// memberDescAdmin is the schema descriptor for admin field.
-	memberDescAdmin := memberFields[1].Descriptor()
-	// member.DefaultAdmin holds the default value on creation for the admin field.
-	member.DefaultAdmin = memberDescAdmin.Default.(bool)
-}
+// The schema-stitching logic is generated in github.com/bodokaiser/entgo-multi-tenancy/ent/runtime/runtime.go
