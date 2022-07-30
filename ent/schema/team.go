@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
 	"github.com/bodokaiser/entgo-multi-tenancy/ent/privacy"
 	"github.com/bodokaiser/entgo-multi-tenancy/ent/schema/rule"
 )
@@ -31,6 +32,7 @@ func (Team) Edges() []ent.Edge {
 func (Team) Policy() ent.Policy {
 	return privacy.Policy{
 		Query: privacy.QueryPolicy{
+			rule.DenyIfNoUser(),
 			rule.FilterTeam(),
 			privacy.AlwaysAllowRule(),
 		},

@@ -3,10 +3,11 @@ package rule
 import (
 	"context"
 
-	"entgo.io/ent/examples/privacytenant/ent/privacy"
 	"github.com/bodokaiser/entgo-multi-tenancy/auth"
+	"github.com/bodokaiser/entgo-multi-tenancy/ent"
 	"github.com/bodokaiser/entgo-multi-tenancy/ent/member"
 	"github.com/bodokaiser/entgo-multi-tenancy/ent/predicate"
+	"github.com/bodokaiser/entgo-multi-tenancy/ent/privacy"
 	"github.com/bodokaiser/entgo-multi-tenancy/ent/user"
 )
 
@@ -32,7 +33,7 @@ func FilterTeam() privacy.QueryMutationRule {
 			return privacy.Denyf("user missing from context")
 		}
 
-		tf, ok := f.(TeamFilter)
+		tf, ok := f.(*ent.TeamFilter)
 		if !ok {
 			return privacy.Denyf("incompatible filter type %T", f)
 		}

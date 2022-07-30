@@ -30,39 +30,48 @@ func Example() {
 
 	ctx = auth.WithUser(ctx, user)
 
-	err = client.Team.
+	tf, err := client.Team.
 		Create().
 		SetName("Facebook").
-		Exec(ctx)
+		Save(ctx)
 	if err != nil {
 		log.Fatalf("failed creating team: %v", err)
 	}
+	fmt.Println(tf)
 
-	err = client.Team.
+	tg, err := client.Team.
 		Create().
 		SetName("Google").
-		Exec(ctx)
+		Save(ctx)
 	if err != nil {
 		log.Fatalf("failed creating team: %v", err)
 	}
+	fmt.Println(tg)
 
-	err = client.Member.
+	m, err := client.Member.
 		Create().
 		SetOwner(true).
 		SetUser(user).
-		SetTeamID(2).
-		Exec(ctx)
+		SetTeam(tg).
+		Save(ctx)
 	if err != nil {
 		log.Fatalf("failed creating member: %v", err)
 	}
+	fmt.Println(m)
 
 	teams, err := client.Team.
 		Query().
 		All(ctx)
+	if err != nil {
+		log.Fatalf("failed querying teams: %v", err)
+	}
 	fmt.Println(teams)
 
 	// Output:
 	// User(id=1, username=bodo.kaiser, email=bodo.kaiser@example.org)
+	// Team(id=1, name=Facebook)
+	// Team(id=2, name=Google)
+	// Member(owner=true, admin=false, team_id=1, user_id=1)
 	// [Team(id=2, name=Google)]
 }
 
